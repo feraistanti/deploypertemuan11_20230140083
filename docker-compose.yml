@@ -1,0 +1,36 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: db_mahasiswa
+    restart: always
+    environment:
+      MYSQL_DATABASE: pertemuan11_db
+      MYSQL_USER: springuser
+      MYSQL_PASSWORD: password123
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "3310:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "springuser", "-p12345"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - db_data:/var/lib/mysql
+
+  app:
+    build: .
+    container_name: pertemuan11
+    ports:
+      - "8000:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/pertemuan11_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: springuser
+      SPRING_DATASOURCE_PASSWORD: password123
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+volumes:
+  db_data:
